@@ -20,14 +20,23 @@ resource "aws_launch_template" "TF-LT-Obligatorio" {
 
 dnf update -y
 dnf install -y docker
+dnf install -y git
 
 systemctl enable docker
 systemctl start docker
 
-docker run -d \
---name nginx \
--p 80:80 \
-nginx
+cd /home/ec2-user/app
+
+git clone https://github.com/ISC-2026-Martinez-Ourthe-Cabale/app.git
+
+cat > /home/ec2-user/app/.env <<EOL
+DB_HOST=${aws_db_instance.rds.endpoint}
+DB_NAME=${var.db_name}
+DB_USER=${var.db_username}
+DB_PASSWORD=${var.db_password}
+EOL
+
+docker compose up -d
 
 EOF
   )
