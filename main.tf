@@ -25,9 +25,17 @@ dnf install -y git
 systemctl enable docker
 systemctl start docker
 
-cd /home/ec2-user/app
+sudo usermod -aG docker ec2-user
 
+sudo mkdir -p /usr/libexec/docker/cli-plugins
+sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
+-o /usr/libexec/docker/cli-plugins/docker-compose
+sudo chmod +x /usr/libexec/docker/cli-plugins/docker-compose
+
+
+cd /home/ec2-user/
 git clone https://github.com/ISC-2026-Martinez-Ourthe-Cabale/app.git
+cd /home/ec2-user/app
 
 cat > /home/ec2-user/app/.env <<EOL
 DB_HOST=${var.db_host}
