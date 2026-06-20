@@ -19,33 +19,35 @@ resource "aws_launch_template" "TF-LT-Obligatorio" {
 #!/bin/bash
 
 dnf update -y
-dnf install -y docker
-dnf install -y git
+dnf install -y docker git
 
 systemctl enable docker
 systemctl start docker
 
-sudo usermod -aG docker ec2-user
+usermod -aG docker ec2-user
 
-sudo mkdir -p /usr/libexec/docker/cli-plugins
-sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
+mkdir -p /usr/libexec/docker/cli-plugins
+
+curl -SL \
+https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
 -o /usr/libexec/docker/cli-plugins/docker-compose
-sudo chmod +x /usr/libexec/docker/cli-plugins/docker-compose
 
+chmod +x /usr/libexec/docker/cli-plugins/docker-compose
 
-cd /home/ec2-user/
+cd /opt
 git clone https://github.com/ISC-2026-Martinez-Ourthe-Cabale/app.git
-cd /home/ec2-user/app
+cd /opt/app
 
-cat > /home/ec2-user/app/.env <<EOL
+cat > .env <<EOL
 DB_HOST=${var.db_host}
 DB_NAME=${var.db_name}
 DB_USER=${var.db_username}
 DB_PASSWORD=${var.db_password}
 EOL
 
-docker compose up -d
+sleep 10
 
+docker compose up -d
 EOF
   )
 
