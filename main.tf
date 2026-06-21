@@ -26,24 +26,6 @@ systemctl start docker
 
 usermod -aG docker ec2-user
 
-sudo mkdir -p /usr/local/lib/docker/cli-plugins
-
-sudo curl -SL \
-https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
--o /usr/local/lib/docker/cli-plugins/docker-compose
-
-sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
-
-sudo curl -SL \
-https://github.com/docker/buildx/releases/download/v0.17.1/buildx-v0.17.1.linux-amd64 \
--o /usr/libexec/docker/cli-plugins/docker-buildx
-
-sudo chmod +x /usr/libexec/docker/cli-plugins/docker-buildx
-
-
-git clone https://github.com/ISC-2026-Martinez-Ourthe-Cabale/app.git /opt/app
-cd /opt/app
-
 cat > .env <<EOL
 DB_HOST=${var.db_host}
 DB_NAME=${var.db_name}
@@ -57,7 +39,16 @@ set +a
 
 sleep 10
 
-docker compose up -d
+docker login registry.gitlab.com \
+  -u deploy-token \
+  -p ${GITLAB_TOKEN}
+
+docker pull registry.gitlab.com/mourthecabalediaz/app:latest
+
+docker run -d \
+  -p 80:80 \
+  registry.gitlab.com/mourthecabalediaz/app:latest
+
 EOF
   )
 

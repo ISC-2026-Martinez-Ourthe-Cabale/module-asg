@@ -45,3 +45,7 @@ variable "db_username" {
 variable "db_password" {
   type = string
 }
+
+variable "gitlab_token" {
+  sensitive = true
+}
