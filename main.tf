@@ -41,7 +41,7 @@ sleep 10
 
 docker login registry.gitlab.com \
   -u deploy-token \
-  -p ${GITLAB_TOKEN}
+  -p ${var.gitlab_token}
 
 docker pull registry.gitlab.com/mourthecabalediaz/app:latest
 
