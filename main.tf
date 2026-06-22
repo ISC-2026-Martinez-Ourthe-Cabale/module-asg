@@ -43,11 +43,13 @@ docker login registry.gitlab.com \
   -u deploy-token \
   -p ${var.gitlab_token}
 
-docker pull registry.gitlab.com/mourthecabalediaz/app:latest
-
 docker run -d \
   -p 80:80 \
-  registry.gitlab.com/mourthecabalediaz/app:latest
+  -e DB_HOST=${var.db_host} \
+  -e DB_NAME=${var.db_name} \
+  -e DB_USER=${var.db_username} \
+  -e DB_PASSWORD=${var.db_password} \
+  registry.gitlab.com/mourthecabalediaz/app:1.0
 
 EOF
   )
