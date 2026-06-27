@@ -69,17 +69,19 @@ resource "aws_autoscaling_group" "TF-ASG-Obligatorio" {
 
   name = "${var.name}-ASG"
 
-  min_size         = 2
-  max_size         = 4
-  desired_capacity = 2
+  min_size         = var.min_size
+  max_size         = var.max_size
+  desired_capacity = var.desired_capacity
+
+  default_instance_warmup  = var.instance_warmup
+  health_check_type         = "ELB"
+  health_check_grace_period = var.instance_warmup
 
   vpc_zone_identifier = var.private_subnet_ids
 
   target_group_arns = [
     var.target_group_arn
   ]
-
-  health_check_type = "ELB"
 
   launch_template {
 
@@ -92,5 +94,21 @@ resource "aws_autoscaling_group" "TF-ASG-Obligatorio" {
     key                 = "Name"
     value               = "${var.name}-EC2"
     propagate_at_launch = true
+  }
+}
+
+resource "aws_autoscaling_policy" "traffic_target_tracking" {
+  name                   = "${var.name}-trafico-escalado"
+  autoscaling_group_name = aws_autoscaling_group.TF-ASG-Obligatorio.name
+  policy_type            = "TargetTrackingScaling"
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ALBRequestCountPerTarget"
+      resource_label         = var.alb_resource_label
+    }
+
+    target_value       = var.requests_per_target
+    disable_scale_in   = false
   }
 }
