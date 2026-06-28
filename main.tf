@@ -2,7 +2,7 @@
 ## El Launch Template define la configuración de las instancias EC2, incluyendo el user data para instalar Docker y ejecutar un contenedor Nginx.
 resource "aws_launch_template" "TF-LT-Obligatorio" {
 
-  name_prefix = "AWS-${var.name}"
+  name_prefix = "${var.name}"
 
   image_id      = var.ami
   instance_type = var.instance_type
@@ -99,6 +99,11 @@ resource "aws_autoscaling_group" "TF-ASG-Obligatorio" {
     value               = "${var.name}-EC2"
     propagate_at_launch = true
   }
+  lifecycle {
+    ignore_changes = [
+      desired_capacity
+    ]
+  }
 }
 
 resource "aws_autoscaling_policy" "traffic_target_tracking" {
@@ -115,6 +120,7 @@ resource "aws_autoscaling_policy" "traffic_target_tracking" {
     target_value       = var.requests_per_target
     disable_scale_in   = false
   }
+
 }
 
 ## Esta politica intenta mantener el promedio de CPU del grupo alrededor de 80%.
